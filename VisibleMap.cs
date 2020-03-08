@@ -13,6 +13,8 @@ namespace Roguelike
 
         bool[,] map;
 
+        bool[,] cmap;
+
         public VisibleMap (int x, int y)
         {
             mapX = x;
@@ -27,6 +29,8 @@ namespace Roguelike
                     map[i, j] = false;
                 }
             }
+
+            cmap = new bool[lineOfSight,lineOfSight];
         }
 
         public VisibleMap (int x, int y, int loS)
@@ -44,6 +48,8 @@ namespace Roguelike
                     map[i, j] = false;
                 }
             }
+
+            cmap = new bool[lineOfSight, lineOfSight];
         }
 
         public void CastRay(int x1, int y1, int x2, int y2, Map map)
@@ -201,27 +207,27 @@ namespace Roguelike
                 int jmax = coY + lineOfSight;
                 if (coX + lineOfSight >= mapX)
                 {
-                    imax = mapX;
+                    imax = mapX - 1;
                 }
                 if (coY + lineOfSight >= mapY)
                 {
-                    jmax = mapY;
+                    jmax = mapY - 1;
                 }
                 for (int i = imin; i <= imax; i++)
                 {
-                    this.CastRay(coX, coY, i, (coY - lineOfSight), map);
+                    this.CastRay(coX, coY, i, jmin, map);
                 }
                 for (int i = imin; i <= imax; i++)
                 {
-                    this.CastRay(coX, coY, i, (coY + lineOfSight), map);
+                    this.CastRay(coX, coY, i, jmax, map);
                 }
                 for (int i = jmin; i <= jmax; i++)
                 {
-                    this.CastRay(coX, coY, (coX - lineOfSight), i, map);
+                    this.CastRay(coX, coY, imin, i, map);
                 }
                 for (int i = jmin; i <= jmax; i++)
                 {
-                    this.CastRay(coX, coY, (coX + lineOfSight), i, map);
+                    this.CastRay(coX, coY, imax, i, map);
                 }
             }
         }
@@ -260,15 +266,15 @@ namespace Roguelike
                 int jmax = coY + lineOfSight;
                 if (coX + lineOfSight >= mapX)
                 {
-                    imax = mapX;
+                    imax = mapX - 1;
                 }
                 if (coY + lineOfSight >= mapY)
                 {
-                    jmax = mapY;
+                    jmax = mapY - 1;
                 }
-                for (int i = imin; i < imax; i++)
+                for (int i = imin; i <= imax; i++)
                 {
-                    for (int j = jmin; j < jmax; j++)
+                    for (int j = jmin; j <= jmax; j++)
                     {
                         if (this.map[i, j])
                             map.Draw(i, j);
@@ -287,8 +293,8 @@ namespace Roguelike
                     break;
 
                 case 1:
-                    coX = X++;
-                    coY = Y--;
+                    coX = X+1;
+                    coY = Y-1;
                     if (coX - lineOfSight >= 0 & coY - lineOfSight >= 1 & coX + lineOfSight < mapX & coY + lineOfSight < mapY)
                     {
                         for (int i = coX - lineOfSight; i < coX + lineOfSight; i++)
@@ -296,7 +302,6 @@ namespace Roguelike
                             if (this.map[i, coY - lineOfSight])
                             {
                                 map.Draw(i, coY - lineOfSight, ConsoleColor.DarkGray);
-                                this.map[i, coY - lineOfSight] = false;
                             }   
                         }
                         for (int j = coY - lineOfSight; j < coY + lineOfSight; j++)
@@ -304,7 +309,6 @@ namespace Roguelike
                             if (this.map[coX + lineOfSight, j])
                             {
                                 map.Draw(coX + lineOfSight, j, ConsoleColor.DarkGray);
-                                this.map[coX + lineOfSight, j] = false;
                             }
                         }
                     }
@@ -324,26 +328,24 @@ namespace Roguelike
                         int jmax = coY + lineOfSight;
                         if (coX + lineOfSight >= mapX)
                         {
-                            imax = mapX;
+                            imax = mapX - 1;
                         }
                         if (coY + lineOfSight >= mapY)
                         {
-                            jmax = mapY;
+                            jmax = mapY - 1;
                         }
-                        for (int i = imin; i < imax; i++)
+                        for (int i = imin; i <= imax; i++)
                         {
                             if (this.map[i, jmin])
                             {
                                 map.Draw(i, jmin, ConsoleColor.DarkGray);
-                                this.map[i, jmin] = false;
                             }  
                         }
-                        for (int j = jmin; j < jmax; j++)
+                        for (int j = jmin; j <= jmax; j++)
                         {
-                            if (this.map[imax - 1, j])
+                            if (this.map[imax, j])
                             {
-                                map.Draw(imax - 1, j, ConsoleColor.DarkGray);
-                                this.map[imax - 1, j] = false;
+                                map.Draw(imax, j, ConsoleColor.DarkGray);
                             }
 
                         }
@@ -351,8 +353,8 @@ namespace Roguelike
                     break;
 
                 case 3:
-                    coX = X--;
-                    coY = Y--;
+                    coX = X-1;
+                    coY = Y-1;
                     if (coX - lineOfSight >= 0 & coY - lineOfSight >= 1 & coX + lineOfSight < mapX & coY + lineOfSight < mapY)
                     {
                         for (int i = coX - lineOfSight; i < coX + lineOfSight; i++)
@@ -360,7 +362,6 @@ namespace Roguelike
                             if (this.map[i, coY - lineOfSight])
                             {
                                 map.Draw(i, coY - lineOfSight, ConsoleColor.DarkGray);
-                                this.map[i, coY - lineOfSight] = false;
                             }
 
                         }
@@ -369,7 +370,6 @@ namespace Roguelike
                             if (this.map[coX - lineOfSight, j])
                             {
                                 map.Draw(coX - lineOfSight, j, ConsoleColor.DarkGray);
-                                this.map[coX - lineOfSight, j] = false;
                             }
                                 
                         }
@@ -390,34 +390,32 @@ namespace Roguelike
                         int jmax = coY + lineOfSight;
                         if (coX + lineOfSight >= mapX)
                         {
-                            imax = mapX;
+                            imax = mapX - 1;
                         }
                         if (coY + lineOfSight >= mapY)
                         {
-                            jmax = mapY;
+                            jmax = mapY - 1;
                         }
-                        for (int i = imin; i < imax; i++)
+                        for (int i = imin; i <= imax; i++)
                         {
                             if (this.map[i, jmin])
                             {
                                 map.Draw(i, jmin, ConsoleColor.DarkGray);
-                                this.map[i, jmin] = false;
                             }  
                         }
-                        for (int j = jmin; j < jmax; j++)
+                        for (int j = jmin; j <= jmax; j++)
                         {
                             if (this.map[imin, j])
                             {
                                 map.Draw(imin, j, ConsoleColor.DarkGray);
-                                this.map[imin, j] = false;
                             }
                         }
                     }
                     break;
 
                 case 7:
-                    coX = X++;
-                    coY = Y++;
+                    coX = X+1;
+                    coY = Y+1;
                     if (coX - lineOfSight >= 0 & coY - lineOfSight >= 1 & coX + lineOfSight < mapX & coY + lineOfSight < mapY)
                     {
                         for (int i = coX - lineOfSight; i < coX + lineOfSight; i++)
@@ -425,7 +423,6 @@ namespace Roguelike
                             if (this.map[i, coY + lineOfSight])
                             {
                                 map.Draw(i, coY + lineOfSight, ConsoleColor.DarkGray);
-                                this.map[i, coY + lineOfSight] = false;
                             }
 
                         }
@@ -434,7 +431,6 @@ namespace Roguelike
                             if (this.map[coX + lineOfSight, j])
                             {
                                 map.Draw(coX + lineOfSight, j, ConsoleColor.DarkGray);
-                                this.map[coX + lineOfSight, j] = false;
                             }
                                 
                         }
@@ -455,34 +451,32 @@ namespace Roguelike
                         int jmax = coY + lineOfSight;
                         if (coX + lineOfSight >= mapX)
                         {
-                            imax = mapX;
+                            imax = mapX - 1;
                         }
                         if (coY + lineOfSight >= mapY)
                         {
-                            jmax = mapY;
+                            jmax = mapY - 1;
                         }
-                        for (int i = imin; i < imax; i++)
+                        for (int i = imin; i <= imax; i++)
                         {
-                            if (this.map[i, jmax - 1])
+                            if (this.map[i, jmax])
                             {
-                                map.Draw(i, jmax - 1, ConsoleColor.DarkGray);
-                                this.map[i, jmax - 1] = false;
+                                map.Draw(i, jmax, ConsoleColor.DarkGray);
                             } 
                         }
-                        for (int j = jmin; j < jmax; j++)
+                        for (int j = jmin; j <= jmax; j++)
                         {
-                            if (this.map[imax - 1, j])
+                            if (this.map[imax, j])
                             {
-                                map.Draw(imax - 1, j, ConsoleColor.DarkGray);
-                                this.map[imax - 1, j] = false;
+                                map.Draw(imax, j, ConsoleColor.DarkGray);
                             }    
                         }
                     }
                     break;
 
                 case 9:
-                    coX = X--;
-                    coY = Y++;
+                    coX = X-1;
+                    coY = Y+1;
                     if (coX - lineOfSight >= 0 & coY - lineOfSight >= 1 & coX + lineOfSight < mapX & coY + lineOfSight < mapY)
                     {
                         for (int i = coX - lineOfSight; i < coX + lineOfSight; i++)
@@ -490,7 +484,6 @@ namespace Roguelike
                             if (this.map[i, coY + lineOfSight])
                             {
                                 map.Draw(i, coY + lineOfSight, ConsoleColor.DarkGray);
-                                this.map[i, coY + lineOfSight] = false;
                             }     
                         }
                         for (int j = coY - lineOfSight; j < coY + lineOfSight; j++)
@@ -498,7 +491,6 @@ namespace Roguelike
                             if (this.map[coX - lineOfSight, j])
                             {
                                 map.Draw(coX - lineOfSight, j, ConsoleColor.DarkGray);
-                                this.map[coX - lineOfSight, j] = false;
                             }                               
                         }
                     }
@@ -518,27 +510,25 @@ namespace Roguelike
                         int jmax = coY + lineOfSight;
                         if (coX + lineOfSight >= mapX)
                         {
-                            imax = mapX;
+                            imax = mapX - 1;
                         }
                         if (coY + lineOfSight >= mapY)
                         {
-                            jmax = mapY;
+                            jmax = mapY - 1;
                         }
-                        for (int i = imin; i < imax; i++)
+                        for (int i = imin; i <= imax; i++)
                         {
-                            if (this.map[i, jmax - 1])
+                            if (this.map[i, jmax])
                             {
-                                map.Draw(i, jmax - 1, ConsoleColor.DarkGray);
-                                this.map[i, jmax - 1] = false;
+                                map.Draw(i, jmax, ConsoleColor.DarkGray);
                             }
                                 
                         }
-                        for (int j = jmin; j < jmax; j++)
+                        for (int j = jmin; j <= jmax; j++)
                         {
                             if (this.map[imin, j])
                             {
                                 map.Draw(imin, j, ConsoleColor.DarkGray);
-                                this.map[imin, j] = false;
                             }                               
                         }
                     }
@@ -546,7 +536,7 @@ namespace Roguelike
 
                 case 2:
                     coX = X;
-                    coY = Y--;
+                    coY = Y-1;
                     if (coX - lineOfSight >= 0 & coY - lineOfSight >= 1 & coX + lineOfSight < mapX & coY + lineOfSight < mapY)
                     {
                         for (int i = coX - lineOfSight; i < coX + lineOfSight; i++)
@@ -554,7 +544,6 @@ namespace Roguelike
                             if (this.map[i, coY - lineOfSight])
                             {
                                 map.Draw(i, coY - lineOfSight, ConsoleColor.DarkGray);
-                                this.map[i, coY - lineOfSight] = false;
                             }
                         }
                     }
@@ -573,14 +562,13 @@ namespace Roguelike
                         int imax = coX + lineOfSight;
                         if (coX + lineOfSight >= mapX)
                         {
-                            imax = mapX;
+                            imax = mapX - 1;
                         }
-                        for (int i = imin; i < imax; i++)
+                        for (int i = imin; i <= imax; i++)
                         {
                             if (this.map[i, jmin])
                             {
                                 map.Draw(i, jmin, ConsoleColor.DarkGray);
-                                this.map[i, jmin] = false;
                             }
 
                         }
@@ -588,7 +576,7 @@ namespace Roguelike
                     break;
                 case 8:
                     coX = X;
-                    coY = Y++;
+                    coY = Y+1;
                     if (coX - lineOfSight >= 0 & coY - lineOfSight >= 1 & coX + lineOfSight < mapX & coY + lineOfSight < mapY)
                     {
                         for (int i = coX - lineOfSight; i < coX + lineOfSight; i++)
@@ -596,7 +584,6 @@ namespace Roguelike
                             if (this.map[i, coY + lineOfSight])
                             {
                                 map.Draw(i, coY + lineOfSight, ConsoleColor.DarkGray);
-                                this.map[i, coY + lineOfSight] = false;
                             }
                         }
                     }
@@ -611,25 +598,24 @@ namespace Roguelike
                         int jmax = coY + lineOfSight;
                         if (coX + lineOfSight >= mapX)
                         {
-                            imax = mapX;
+                            imax = mapX - 1;
                         }
                         if (coY + lineOfSight >= mapY)
                         {
-                            jmax = mapY;
+                            jmax = mapY - 1;
                         }
-                        for (int i = imin; i < imax; i++)
+                        for (int i = imin; i <= imax; i++)
                         {
-                            if (this.map[i, jmax -1])
+                            if (this.map[i, jmax])
                             {
-                                map.Draw(i, jmax - 1, ConsoleColor.DarkGray);
-                                this.map[i, jmax - 1] = false;
+                                map.Draw(i, jmax, ConsoleColor.DarkGray);
                             }
 
                         }
                     }
                     break;
                 case 6:
-                    coX = X--;
+                    coX = X-1;
                     coY = Y;
                     if (coX - lineOfSight >= 0 & coY - lineOfSight >= 1 & coX + lineOfSight < mapX & coY + lineOfSight < mapY)
                     {
@@ -638,7 +624,6 @@ namespace Roguelike
                             if (this.map[coX - lineOfSight,j])
                             {
                                 map.Draw(coX - lineOfSight, j, ConsoleColor.DarkGray);
-                                this.map[coX - lineOfSight, j] = false;
                             }
                         }
                     }
@@ -657,21 +642,20 @@ namespace Roguelike
                         int jmax = coY + lineOfSight;
                         if (coY + lineOfSight >= mapY)
                         {
-                            jmax = mapY;
+                            jmax = mapY - 1;
                         }
-                        for (int j = jmin; j < jmax; j++)
+                        for (int j = jmin; j <= jmax; j++)
                         {
                             if (this.map[imin, j])
                             {
                                 map.Draw(imin, j, ConsoleColor.DarkGray);
-                                this.map[imin, j] = false;
                             }
 
                         }
                     }
                     break;
                 case 4:
-                    coX = X++;
+                    coX = X+1;
                     coY = Y;
                     if (coX - lineOfSight >= 0 & coY - lineOfSight >= 1 & coX + lineOfSight < mapX & coY + lineOfSight < mapY)
                     {
@@ -680,7 +664,6 @@ namespace Roguelike
                             if (this.map[coX + lineOfSight, j])
                             {
                                 map.Draw(coX + lineOfSight, j, ConsoleColor.DarkGray);
-                                this.map[coX + lineOfSight, j] = false;
                             }
                         }
                     }
@@ -695,18 +678,17 @@ namespace Roguelike
                         int jmax = coY + lineOfSight;
                         if (coX + lineOfSight >= mapX)
                         {
-                            imax = mapX;
+                            imax = mapX - 1;
                         }
                         if (coY + lineOfSight >= mapY)
                         {
-                            jmax = mapY;
+                            jmax = mapY - 1;
                         }
-                        for (int j = jmin; j < jmax; j++)
+                        for (int j = jmin; j <= jmax; j++)
                         {
-                            if (this.map[imax - 1, j])
+                            if (this.map[imax, j])
                             {
-                                map.Draw(imax - 1, j, ConsoleColor.DarkGray);
-                                this.map[imax - 1, j] = false;
+                                map.Draw(imax, j, ConsoleColor.DarkGray);
                             }
 
                         }
