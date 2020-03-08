@@ -1,4 +1,5 @@
 using System;
+using System.Runtime;
 
 namespace Roguelike
 
@@ -34,22 +35,21 @@ namespace Roguelike
             ConsoleKeyInfo keyInfo;
             int redo = 0;
             int turn = 0;
+            
 
             Console.CursorVisible = false;
 
-            Map map = new Map(120, 29);
-            map.GenerateDungeonRooms(7);
-            map.GenerateDungeonDoors();
-            map.GenerateDungeonPaths();
-            map.RemoveExcessiveDoors();
-            map.Colorize();
+            Levels levels = new Levels(100);
+            int dLevel = levels.getDLevel();
 
-            int coY = map.GetUpStair()%1000;
-            int coX = (map.GetUpStair()-coY)/1000;
+            levels.InitLevels();
 
-            VisibleMap visibleMap = new VisibleMap(120, 29);
-            visibleMap.CalculateMap(coX, coY, map);
-            visibleMap.Draw(coX, coY, map);
+            int coY = levels.getCurrentMap().GetUpStair()%1000;
+            int coX = (levels.getCurrentMap().GetUpStair()-coY)/1000;
+
+            
+            levels.getCurrentVisibleMap().CalculateMap(coX, coY, levels.getCurrentMap());
+            levels.getCurrentVisibleMap().Draw(coX, coY, levels.getCurrentMap());
 
             DrawPlayer(coX, coY);
 
@@ -60,6 +60,9 @@ namespace Roguelike
                 Console.SetCursorPosition(0, 29);
                 Console.Write("Turn: " + turn.ToString());
 
+                Console.SetCursorPosition(15, 29);
+                Console.Write("Dungeon Level: " + (dLevel+1).ToString());
+
                 keyInfo = Console.ReadKey(true);
 
                 ClearLog();
@@ -69,53 +72,58 @@ namespace Roguelike
                 switch (keyInfo.Key)
                 {
                     case ConsoleKey.NumPad4:
-                        map.Draw(coX, coY);
+                        levels.getCurrentMap().Draw(coX, coY, ConsoleColor.DarkGray);
                         Move(4);
                         moveDirection = 4;
                         break;
                     case ConsoleKey.NumPad6:
-                        map.Draw(coX, coY);
+                        levels.getCurrentMap().Draw(coX, coY, ConsoleColor.DarkGray);
                         Move(6);
                         moveDirection = 6;
                         break;
                     case ConsoleKey.NumPad8:
-                        map.Draw(coX, coY);
+                        levels.getCurrentMap().Draw(coX, coY, ConsoleColor.DarkGray);
                         Move(8);
                         moveDirection = 8;
                         break;
                     case ConsoleKey.NumPad2:
-                        map.Draw(coX, coY);
+                        levels.getCurrentMap().Draw(coX, coY, ConsoleColor.DarkGray);
                         Move(2);
                         moveDirection = 2;
                         break;
                     case ConsoleKey.NumPad1:
-                        map.Draw(coX, coY);
+                        levels.getCurrentMap().Draw(coX, coY, ConsoleColor.DarkGray);
                         Move(1);
                         moveDirection = 1;
                         break;
                     case ConsoleKey.NumPad3:
-                        map.Draw(coX, coY);
+                        levels.getCurrentMap().Draw(coX, coY, ConsoleColor.DarkGray);
                         Move(3);
                         moveDirection = 3;
                         break;
                     case ConsoleKey.NumPad7:
-                        map.Draw(coX, coY);
+                        levels.getCurrentMap().Draw(coX, coY, ConsoleColor.DarkGray);
                         Move(7);
                         moveDirection = 7;
                         break;
                     case ConsoleKey.NumPad9:
-                        map.Draw(coX, coY);
+                        levels.getCurrentMap().Draw(coX, coY, ConsoleColor.DarkGray);
                         Move(9);
                         moveDirection = 9;
                         break;
-                    case ConsoleKey.M:
-                        map.Draw();
+                    case ConsoleKey.Enter:
+                        Interact(coX, coY, levels.getCurrentMap());
+                        break;
+                    case ConsoleKey.C:
+                        Console.SetCursorPosition(0, 0);
+                        string cheat = Console.ReadLine();
+                        Cheat(cheat);
                         break;
                 }
 
-                visibleMap.CalculateMap(coX, coY, map);
-                visibleMap.DrawGreyOut(coX, coY, moveDirection, map);
-                visibleMap.Draw(coX, coY, map);
+                levels.getCurrentVisibleMap().CalculateMap(coX, coY, levels.getCurrentMap());
+                levels.getCurrentVisibleMap().DrawGreyOut(coX, coY, moveDirection, levels.getCurrentMap());
+                levels.getCurrentVisibleMap().Draw(coX, coY, levels.getCurrentMap());
                 
 
                 DrawPlayer(coX, coY);
@@ -134,7 +142,7 @@ namespace Roguelike
                     case 1:
                         coX--;
                         coY++;
-                        if (!map.IsPassable(coX,coY))
+                        if (!levels.getCurrentMap().IsPassable(coX,coY))
                         {
                             Log("You bumped into a wall!");
                             coX++;
@@ -144,7 +152,7 @@ namespace Roguelike
                         break;
                     case 2:
                         coY++;
-                        if (!map.IsPassable(coX, coY))
+                        if (!levels.getCurrentMap().IsPassable(coX, coY))
                         {
                             Log("You bumped into a wall!");
                             coY--;
@@ -154,7 +162,7 @@ namespace Roguelike
                     case 3:
                         coX++;
                         coY++;
-                        if (!map.IsPassable(coX, coY))
+                        if (!levels.getCurrentMap().IsPassable(coX, coY))
                         {
                             Log("You bumped into a wall!");
                             coX--;
@@ -164,7 +172,7 @@ namespace Roguelike
                         break;
                     case 4:
                         coX--;
-                        if (!map.IsPassable(coX, coY))
+                        if (!levels.getCurrentMap().IsPassable(coX, coY))
                         {
                             Log("You bumped into a wall!");
                             coX++;
@@ -173,7 +181,7 @@ namespace Roguelike
                         break;
                     case 6:
                         coX++;
-                        if (!map.IsPassable(coX, coY))
+                        if (!levels.getCurrentMap().IsPassable(coX, coY))
                         {
                             Log("You bumped into a wall!");
                             coX--;
@@ -183,7 +191,7 @@ namespace Roguelike
                     case 7:
                         coX--;
                         coY--;
-                        if (!map.IsPassable(coX, coY))
+                        if (!levels.getCurrentMap().IsPassable(coX, coY))
                         {
                             Log("You bumped into a wall!");
                             coX++;
@@ -193,7 +201,7 @@ namespace Roguelike
                         break;
                     case 8:
                         coY--;
-                        if (!map.IsPassable(coX, coY))
+                        if (!levels.getCurrentMap().IsPassable(coX, coY))
                         {
                             Log("You bumped into a wall!");
                             coY++;
@@ -203,7 +211,7 @@ namespace Roguelike
                     case 9:
                         coX++;
                         coY--;
-                        if (!map.IsPassable(coX, coY))
+                        if (!levels.getCurrentMap().IsPassable(coX, coY))
                         {
                             Log("You bumped into a wall!");
                             coX--;
@@ -214,6 +222,66 @@ namespace Roguelike
                 }
 
                 
+            }
+
+            void Interact(int x, int y, Map map)
+            {
+                char target = map.GetChar(x, y);
+                switch (target)
+                {
+                    case '<':
+                        levels.goUpStairs();
+                        coY = levels.getCurrentMap().GetDownStair() % 1000;
+                        coX = (levels.getCurrentMap().GetDownStair() - coY) / 1000;
+                        Console.Clear();
+                        dLevel = levels.getDLevel();
+                        levels.getCurrentMap().Draw(levels.getCurrentVisibleMap());
+                        break;
+                    case '>':
+                        levels.goDownStairs();
+                        coY = levels.getCurrentMap().GetUpStair() % 1000;
+                        coX = (levels.getCurrentMap().GetUpStair() - coY) / 1000;
+                        Console.Clear();
+                        dLevel = levels.getDLevel();
+                        levels.getCurrentMap().Draw(levels.getCurrentVisibleMap());
+                        break;
+                }
+            }
+
+            void Cheat(string code)
+            {
+                switch (code)
+                {
+                    case "Teleport":
+                        Log("Where do you want to teleport to? Type coordinates x,y: ");
+                        string coorodinate = Console.ReadLine();
+                        int x = Convert.ToInt16(coorodinate.Split(',')[0]);
+                        int y = Convert.ToInt16(coorodinate.Split(',')[1]);
+                        Teleport(x,y);
+                        break;
+                    case "See Map":
+                        levels.getCurrentMap().Draw();
+                        break;
+                    case "Teleport Levels":
+                        Log("Which level do you want to teleport to? Type dLevel: ");
+                        string input = Console.ReadLine();
+                        int i = Convert.ToInt16(input);
+                        levels.setDLevel(i);
+                        coY = levels.getCurrentMap().GetUpStair() % 1000;
+                        coX = (levels.getCurrentMap().GetUpStair() - coY) / 1000;
+                        Console.Clear();
+                        dLevel = levels.getDLevel();
+                        levels.getCurrentMap().Draw(levels.getCurrentVisibleMap());
+                        break;
+
+                }
+            }
+
+            void Teleport(int xcor, int ycor)
+            {
+                levels.getCurrentMap().Draw(coX, coY);
+                coX = xcor;
+                coY = ycor;
             }
         }
     }
