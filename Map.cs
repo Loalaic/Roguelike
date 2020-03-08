@@ -73,6 +73,21 @@ namespace Roguelike
             Console.Write(map[x, y]);
         }
 
+        public void Draw(VisibleMap vmap){
+            for (int i = 0; i < mapX; i++)
+            {
+                for (int j = 0; j < mapY; j++)
+                {
+                    if (vmap.GetMap(i, j))
+                    {
+                        Console.SetCursorPosition(i, j);
+                        Console.ForegroundColor = ConsoleColor.DarkGray;
+                        Console.Write(map[i, j]);
+                    }
+                }
+            }
+        }
+
         //Setter for individual tiles specified by coordinate
         public void SetChar(int x, int y, char c)
         {
@@ -428,3 +443,4 @@ namespace Roguelike
         }
     }
 }
+
