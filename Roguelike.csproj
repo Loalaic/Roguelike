@@ -1,0 +1,12 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <AssemblyName>Roguelike</AssemblyName>
+    <RootNamespace>Roguelike</RootNamespace>
+    <ApplicationIcon />
+    <StartupObject>Roguelike.Program</StartupObject>
+  </PropertyGroup>
+
+</Project>
